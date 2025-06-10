@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  # Database
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: apr_db
+      POSTGRES_USER: apr_user
+      POSTGRES_PASSWORD: apr_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apr_user -d apr_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Core Services
+  submission-api:
+    build:
+      context: ../backend
+      dockerfile: submission_api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://apr_user:apr_pass@db:5432/apr_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  orchestrator:
+    build:
+      context: ../backend
+      dockerfile: orchestrator/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql://apr_user:apr_pass@db:5432/apr_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - submission-api
+
+  # Agent Services
+  plagiarism-detector:
+    build:
+      context: ../backend
+      dockerfile: agents/plagiarism_detector/Dockerfile
+    ports:
+      - "8002:8002"
+
+  methodology-reviewer:
+    build:
+      context: ../backend
+      dockerfile: agents/methodology_reviewer/Dockerfile
+    ports:
+      - "8003:8003"
+
+  ethics-agent:
+    build:
+      context: ../backend
+      dockerfile: agents/ethics_agent/Dockerfile
+    ports:
+      - "8004:8004"
+
+  statistical-reviewer:
+    build:
+      context: ../backend
+      dockerfile: agents/statistical_reviewer/Dockerfile
+    ports:
+      - "8005:8005"
+
+  data-integrity-agent:
+    build:
+      context: ../backend
+      dockerfile: agents/data_integrity_agent/Dockerfile
+    ports:
+      - "8006:8006"
+
+  reproducibility-agent:
+    build:
+      context: ../backend
+      dockerfile: agents/reproducibility_agent/Dockerfile
+    ports:
+      - "8007:8007"
+
+  clarity-agent:
+    build:
+      context: ../backend
+      dockerfile: agents/clarity_agent/Dockerfile
+    ports:
+      - "8008:8008"
+
+  content-triage-agent:
+    build:
+      context: ../backend
+      dockerfile: agents/content_triage_agent/Dockerfile
+    ports:
+      - "8009:8009"
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    driver: bridge
