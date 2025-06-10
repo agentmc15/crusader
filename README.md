@@ -395,6 +395,6 @@ graph TD
 ---
 
 **Status**: ✅ **Fully Functional Prototype Available**  
-**Last Updated**: $(date +"%B %d, %Y")
+**Last Updated**: June 8th, 2025
 
 Ready to revolutionize scholarly peer review with AI-driven automation!
