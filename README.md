@@ -297,7 +297,7 @@ docker-compose up -d --build
 
 ## 📜 License
 
-[Add your license information here]
+MIT License
 
 ---
 
@@ -395,6 +395,6 @@ graph TD
 ---
 
 **Status**: ✅ **Fully Functional Prototype Available**  
-**Last Updated**: June 8th, 2025
+**Last Updated**: June 10th, 2025
 
 Ready to revolutionize scholarly peer review with AI-driven automation!
